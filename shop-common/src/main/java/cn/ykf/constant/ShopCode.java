@@ -1,4 +1,4 @@
-package cn.constant;
+package cn.ykf.constant;
 
 /**
  * 状态常量枚举

@@ -1,6 +1,6 @@
-package cn.exception;
+package cn.ykf.exception;
 
-import cn.constant.ShopCode;
+import cn.ykf.constant.ShopCode;
 import lombok.extern.slf4j.Slf4j;
 
 /**
