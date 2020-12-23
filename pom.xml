@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+	<modules>
+		<module>shop-coupon</module>
+		<module>shop-goods</module>
+		<module>shop-order</module>
+		<module>shop-pay</module>
+		<module>shop-common</module>
+		<module>shop-web</module>
+		<module>shop-user</module>
+	</modules>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.7.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<groupId>cn.ykf</groupId>
+	<artifactId>shop-all</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<description>整合Dubbo、RocketMQ的微服务项目demo</description>
+
+	<properties>
+		<file.encoding>UTF-8</file.encoding>
+		<java.version>1.8</java.version>
+		<dubbo.version>2.7.7</dubbo.version>
+		<curator.version>2.13.0</curator.version>
+		<mybatis.version>2.1.4</mybatis.version>
+		<mysql.version>5.1.30</mysql.version>
+	</properties>
+
+	<!-- 仓库配置 -->
+	<repositories>
+		<repository>
+			<id>alimaven</id>
+			<name>aliyun maven</name>
+			<url>https://maven.aliyun.com/repository/public</url>
+		</repository>
+	</repositories>
+
+	<!-- 环境配置 -->
+	<profiles>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<profile.active>prod</profile.active>
+				<profile.jdk.version>1.8</profile.jdk.version>
+				<profile.logger.path>./logs</profile.logger.path>
+
+			</properties>
+		</profile>
+		<profile>
+			<id>dev</id>
+			<properties>
+				<profile.active>dev</profile.active>
+				<profile.jdk.version>1.8</profile.jdk.version>
+				<profile.logger.path>./logs</profile.logger.path>
+			</properties>
+			<!-- 默认环境 -->
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+	</profiles>
+
+	<!-- 依赖版本号管理 -->
+	<dependencyManagement>
+		<dependencies>
+			<!-- Dubbo Starter -->
+			<dependency>
+				<groupId>org.apache.dubbo</groupId>
+				<artifactId>dubbo-spring-boot-starter</artifactId>
+				<version>${dubbo.version}</version>
+			</dependency>
+			<!-- Zookeeper 依赖 -->
+			<dependency>
+				<groupId>org.apache.curator</groupId>
+				<artifactId>curator-recipes</artifactId>
+				<version>${curator.version}</version>
+			</dependency>
+			<!-- Mybatis Starter -->
+			<dependency>
+				<groupId>org.mybatis.spring.boot</groupId>
+				<artifactId>mybatis-spring-boot-starter</artifactId>
+				<version>${mybatis.version}</version>
+			</dependency>
+			<!-- MySQL Driver -->
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>${mysql.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.xml</include>
+					<include>**/*.properties</include>
+					<include>**/*.yml</include>
+					<include>**/*.factories</include>
+					<include>**/*.provides</include>
+					<include>**/*.ini</include>
+					<include>**/*.tld</include>
+					<include>static/</include>
+					<include>templates/</include>
+				</includes>
+				<excludes>
+					<exclude>logback-test.xml</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<directory>src/main/resources/excel</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**</include>
+				</includes>
+				<targetPath>excel</targetPath>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
