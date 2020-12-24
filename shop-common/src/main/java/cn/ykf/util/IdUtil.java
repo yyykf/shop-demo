@@ -1,12 +1,15 @@
 package cn.ykf.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * ID生成器，使用雪花算法
  *
  * @author YuKaiFan <1092882580@qq.com>
  * @date 2020/12/23
  */
-public class IdUtils {
+@Slf4j
+public class IdUtil {
     /** 起始的时间戳 */
     private final static long START_STAMP = 1480166465631L;
 
@@ -28,23 +31,42 @@ public class IdUtils {
     private final static long TIMESTAMP_LEFT = DATACENTER_LEFT + DATACENTER_BIT;
     private final static long MACHINE_LEFT = SEQUENCE_BIT;
 
-    /** 数据中心 */
+    /** 数据中心，可以通过命令行参数 -Dcenterid=1 指定 */
     private final long datacenterId;
-    /** 机器标识 */
+    /** 机器标识，可以通过命令行参数 -Dmachineid=1 指定 */
     private final long machineId;
     /** 序列号 */
     private long sequence = 0L;
     /** 上一次时间戳 */
     private long lastStamp = -1L;
 
-    public IdUtils(long datacenterId, long machineId) {
-        if (datacenterId > MAX_DATACENTER_NUM || datacenterId < 0) {
+    /**
+     * 获取一个ID生成器
+     *
+     * @return ID生成器
+     */
+    public static IdUtil getInstance() {
+        return new IdUtil();
+    }
+
+    private IdUtil() {
+        long centerId;
+        long machineId;
+        try {
+            centerId = Long.parseLong(System.getProperty("centerid"));
+            machineId = Long.parseLong(System.getProperty("machineid"));
+        } catch (NumberFormatException e) {
+            log.error("数据中心id和机器id只能为不大于31的整数");
+            throw new IllegalArgumentException(e);
+        }
+
+        if (centerId > MAX_DATACENTER_NUM || centerId < 0) {
             throw new IllegalArgumentException("datacenterId can't be greater than MAX_DATACENTER_NUM or less than 0");
         }
         if (machineId > MAX_MACHINE_NUM || machineId < 0) {
             throw new IllegalArgumentException("machineId can't be greater than MAX_MACHINE_NUM or less than 0");
         }
-        this.datacenterId = datacenterId;
+        this.datacenterId = centerId;
         this.machineId = machineId;
     }
 
@@ -93,12 +115,5 @@ public class IdUtils {
 
     private long getNewStamp() {
         return System.currentTimeMillis();
-    }
-
-    public static void main(String[] args) {
-        IdUtils idUtils = new IdUtils(2, 3);
-        for (int i = 0; i < 10; i++) {
-            System.out.println(idUtils.nextId());
-        }
     }
 }
