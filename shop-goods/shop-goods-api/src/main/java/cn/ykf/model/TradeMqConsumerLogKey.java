@@ -1,6 +1,8 @@
 package cn.ykf.model;
 
-public class TradeMqConsumerLogKey {
+import java.io.Serializable;
+
+public class TradeMqConsumerLogKey implements Serializable {
     private String groupName;
 
     private String msgTag;

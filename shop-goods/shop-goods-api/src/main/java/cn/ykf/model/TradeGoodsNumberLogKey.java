@@ -1,6 +1,8 @@
 package cn.ykf.model;
 
-public class TradeGoodsNumberLogKey {
+import java.io.Serializable;
+
+public class TradeGoodsNumberLogKey implements Serializable {
     private Long goodsId;
 
     private Long orderId;

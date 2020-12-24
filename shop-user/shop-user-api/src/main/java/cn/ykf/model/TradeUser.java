@@ -1,8 +1,9 @@
 package cn.ykf.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class TradeUser {
+public class TradeUser implements Serializable {
     private Long userId;
 
     private String userName;

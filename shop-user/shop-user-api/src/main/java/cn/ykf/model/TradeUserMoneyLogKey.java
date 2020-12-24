@@ -1,6 +1,8 @@
 package cn.ykf.model;
 
-public class TradeUserMoneyLogKey {
+import java.io.Serializable;
+
+public class TradeUserMoneyLogKey implements Serializable {
     private Long userId;
 
     private Long orderId;
