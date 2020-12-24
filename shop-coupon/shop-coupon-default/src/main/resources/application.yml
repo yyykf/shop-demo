@@ -1,0 +1,36 @@
+spring:
+  profiles:
+    active: ${profile.active}
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/trade?useUnicode=true&characterEncoding=utf8&useAffectedRows=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 500
+      pool-name: HikariPool
+
+logging:
+  level:
+    cn.ykf: debug
+
+mybatis:
+  # mapper 文件位置
+  mapper-locations: classpath:cn/ykf/dao/mapper/*.xml
+
+dubbo:
+  # Dubbo 应用名称
+  application:
+    name: coupon-module
+  # 注册中心地址
+  registry:
+    address: zookeeper://127.0.0.1:2181?backup=127.0.0.1:2182,127.0.0.1:2183
+  # 服务暴露端口和协议
+  protocol:
+    name: dubbo
+    port: 20880
+  # 10s 超时，不重试
+  provider:
+    timeout: 10000
+    retries: 0
