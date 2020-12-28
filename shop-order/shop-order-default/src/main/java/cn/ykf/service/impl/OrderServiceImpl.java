@@ -53,7 +53,7 @@ public class OrderServiceImpl implements OrderService {
         // 校验订单
         this.checkOrder(order);
         // 生成预订单
-        this.savePreOrder(order);
+        Long orderId = this.savePreOrder(order);
         try {
             // 扣减库存
             this.reduceGoodsStock(order);
@@ -63,6 +63,8 @@ public class OrderServiceImpl implements OrderService {
             this.reduceMoneyPaid(order);
             // 确认订单
             this.updateOrderStatus(order);
+
+            log.info("订单:[" + orderId + "]确认成功");
         } catch (Exception e) {
             // todo 确认订单失败,发送消息
 
@@ -196,7 +198,7 @@ public class OrderServiceImpl implements OrderService {
             BusinessException.cast(ShopCode.SHOP_ORDER_TOP_PRICE_INVALID);
         }
 
-        if (BigDecimal.valueOf(100).compareTo(orderAmount) >= 0) {
+        if (BigDecimal.valueOf(100).compareTo(orderAmount) <= 0) {
             return BigDecimal.ZERO;
         }
 
