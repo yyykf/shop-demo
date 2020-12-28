@@ -228,6 +228,6 @@
 
   <!-- 更新库存 -->
   <update id="updateStock">
-    UPDATE trade_goods SET goods_number = #{newStock} WHERE goodsId = #{goodsId} AND goods_number = #{oldStock}
+    UPDATE trade_goods SET goods_number = #{newStock} WHERE goods_id = #{goodsId} AND goods_number = #{oldStock}
   </update>
 </mapper>
