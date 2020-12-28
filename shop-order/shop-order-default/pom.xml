@@ -18,6 +18,21 @@
             <artifactId>shop-order-api</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.ykf</groupId>
+            <artifactId>shop-goods-api</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.ykf</groupId>
+            <artifactId>shop-user-api</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.ykf</groupId>
+            <artifactId>shop-coupon-api</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
 
         <!-- Dubbo Spring Boot Starter -->
         <dependency>

@@ -9,6 +9,15 @@ public class TradeUserMoneyLogKey implements Serializable {
 
     private Integer moneyLogType;
 
+    public TradeUserMoneyLogKey() {
+    }
+
+    public TradeUserMoneyLogKey(Long userId, Long orderId, Integer moneyLogType) {
+        this.userId = userId;
+        this.orderId = orderId;
+        this.moneyLogType = moneyLogType;
+    }
+
     public Long getUserId() {
         return userId;
     }

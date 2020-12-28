@@ -7,6 +7,14 @@ public class TradeGoodsNumberLog extends TradeGoodsNumberLogKey {
 
     private Date logTime;
 
+    public TradeGoodsNumberLog() {
+    }
+
+    public TradeGoodsNumberLog(Long goodsId, Long orderId, Integer goodsNumber) {
+        super(goodsId, orderId);
+        this.goodsNumber = goodsNumber;
+    }
+
     public Integer getGoodsNumber() {
         return goodsNumber;
     }

@@ -1,5 +1,6 @@
 package cn.ykf.service;
 
+import cn.ykf.entity.Result;
 import cn.ykf.model.TradeCoupon;
 
 /**
@@ -16,4 +17,12 @@ public interface CouponService {
      * @return 对应优惠券
      */
     TradeCoupon get(Long couponId);
+
+    /**
+     * 更新优惠券状态
+     *
+     * @param coupon 待更新优惠券
+     * @return Result
+     */
+    Result updateCouponStatus(TradeCoupon coupon);
 }

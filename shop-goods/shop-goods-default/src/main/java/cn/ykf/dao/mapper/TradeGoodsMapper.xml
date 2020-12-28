@@ -216,7 +216,7 @@
     </set>
     where goods_id = #{goodsId,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="cn.ykf.model.TradeGoods" >
+  <update id="updateByPrimaryKey" parameterType="cn.ykf.model.TradeGoods">
     update trade_goods
     set goods_name = #{goodsName,jdbcType=VARCHAR},
       goods_number = #{goodsNumber,jdbcType=INTEGER},
@@ -224,5 +224,10 @@
       goods_desc = #{goodsDesc,jdbcType=VARCHAR},
       add_time = #{addTime,jdbcType=TIMESTAMP}
     where goods_id = #{goodsId,jdbcType=BIGINT}
+  </update>
+
+  <!-- 更新库存 -->
+  <update id="updateStock">
+    UPDATE trade_goods SET goods_number = #{newStock} WHERE goodsId = #{goodsId} AND goods_number = #{oldStock}
   </update>
 </mapper>
