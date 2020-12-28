@@ -13,7 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 @EnableDubbo(scanBasePackages = "cn.ykf.service.impl")
-@MapperScan("cn.ykf.dao.mapper")
+@MapperScan("cn.ykf.dao")
 public class OrderApplication {
 
     public static void main(String[] args) {

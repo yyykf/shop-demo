@@ -125,6 +125,9 @@ public class OrderServiceImpl implements OrderService {
         if (coupon == null) {
             BusinessException.cast(ShopCode.SHOP_COUPON_NO_EXIST);
         }
+        if (Objects.equals(ShopCode.SHOP_COUPON_USED.getCode(), coupon.getIsUsed())) {
+            BusinessException.cast(ShopCode.SHOP_COUPON_USED);
+        }
 
         coupon.setIsUsed(ShopCode.SHOP_COUPON_USED.getCode());
         coupon.setUsedTime(new Date());
@@ -132,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
 
         // 更新优惠券
         Result result = couponService.updateCouponStatus(coupon);
-        if (!Objects.equals(ShopCode.SHOP_FAIL.getSuccess(), result.getSuccess())) {
+        if (Objects.equals(ShopCode.SHOP_FAIL.getSuccess(), result.getSuccess())) {
             BusinessException.cast(ShopCode.SHOP_COUPON_USE_FAIL);
         }
 

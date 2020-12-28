@@ -31,9 +31,9 @@ public class IdUtil {
     private final static long TIMESTAMP_LEFT = DATACENTER_LEFT + DATACENTER_BIT;
     private final static long MACHINE_LEFT = SEQUENCE_BIT;
 
-    /** 数据中心，可以通过命令行参数 -Dcenterid=1 指定 */
+    /** 数据中心，可以通过VM参数 -Dcenterid=1 指定 */
     private final long datacenterId;
-    /** 机器标识，可以通过命令行参数 -Dmachineid=1 指定 */
+    /** 机器标识，可以通过VM参数 -Dmachineid=1 指定 */
     private final long machineId;
     /** 序列号 */
     private long sequence = 0L;
@@ -55,6 +55,8 @@ public class IdUtil {
         try {
             centerId = Long.parseLong(System.getProperty("centerid"));
             machineId = Long.parseLong(System.getProperty("machineid"));
+
+            log.info("centerid-machineid: {}-{}", centerId, machineId);
         } catch (NumberFormatException e) {
             log.error("数据中心id和机器id只能为不大于31的整数");
             throw new IllegalArgumentException(e);
