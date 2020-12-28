@@ -68,7 +68,8 @@ public class GoodsServiceImpl implements GoodsService {
             BusinessException.cast(ShopCode.SHOP_REDUCE_GOODS_NUM_FAIL);
         }
 
-        // 记录日志
+        // 记录日志，扣减，数量应该为负数
+        goods.setGoodsNumber(-(goodsNumberLog.getGoodsNumber()));
         goodsNumberLog.setLogTime(new Date());
         logMapper.insert(goodsNumberLog);
 
