@@ -34,3 +34,14 @@ dubbo:
   provider:
     timeout: 10000
     retries: 0
+
+rocketmq:
+  producer:
+    group: OrderProducer
+  name-server: 172.16.61.100:9876;172.16.61.101:9876
+
+order:
+  topic: ORDER_MSG
+  tag:
+    confirm: order_confirm
+    cancel: order_cancel

@@ -32,6 +32,7 @@
 		<curator.version>2.13.0</curator.version>
 		<mybatis.version>2.1.4</mybatis.version>
 		<mysql.version>5.1.30</mysql.version>
+		<rocketmq.version>2.1.1</rocketmq.version>
 	</properties>
 
 	<!-- 仓库配置 -->
@@ -71,6 +72,12 @@
 	<!-- 依赖版本号管理 -->
 	<dependencyManagement>
 		<dependencies>
+			<!-- RocketMQ Starter -->
+			<dependency>
+				<groupId>org.apache.rocketmq</groupId>
+				<artifactId>rocketmq-spring-boot-starter</artifactId>
+				<version>${rocketmq.version}</version>
+			</dependency>
 			<!-- Dubbo Starter -->
 			<dependency>
 				<groupId>org.apache.dubbo</groupId>
@@ -144,6 +151,10 @@
 						<exclude>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
+						</exclude>
+						<exclude>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-configuration-processor</artifactId>
 						</exclude>
 					</excludes>
 				</configuration>

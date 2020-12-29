@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "order.topic",
+      "type": "java.lang.String",
+      "description": "订单消息TOPIC"
+    },
+    {
+      "name": "order.tag.confirm",
+      "type": "java.lang.String",
+      "description": "确认订单消息TAG"
+    },
+    {
+      "name": "order.tag.cancel",
+      "type": "java.lang.String",
+      "description": "取消订单消息TAG"
+    }
+  ]
+}

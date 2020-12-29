@@ -1,7 +1,9 @@
 package cn.ykf.service.impl;
 
+import cn.ykf.config.OrderMsgProperties;
 import cn.ykf.constant.ShopCode;
 import cn.ykf.dao.TradeOrderMapper;
+import cn.ykf.entity.CancelOrderMsg;
 import cn.ykf.entity.Result;
 import cn.ykf.exception.BusinessException;
 import cn.ykf.model.TradeCoupon;
@@ -18,6 +20,9 @@ import cn.ykf.util.IdHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -47,6 +52,12 @@ public class OrderServiceImpl implements OrderService {
     @Resource
     private TradeOrderMapper orderMapper;
 
+    @Resource
+    private OrderMsgProperties orderMsgProperties;
+
+    @Resource
+    private RocketMQTemplate mqTemplate;
+
 
     @Override
     public Result confirmOrder(TradeOrder order) {
@@ -66,11 +77,34 @@ public class OrderServiceImpl implements OrderService {
 
             log.info("订单:[" + orderId + "]确认成功");
         } catch (Exception e) {
-            // todo 确认订单失败,发送消息
+            log.error("确认订单失败，准备回滚", e);
+
+            CancelOrderMsg cancelMsg = CancelOrderMsg.of(orderId, order.getCouponId(), order.getUserId(), order.getMoneyPaid(), order.getGoodsId(), order.getGoodsNumber());
+            this.sendCancelOrderMsg(cancelMsg);
 
             return Result.of(ShopCode.SHOP_FAIL);
         }
         return Result.of(ShopCode.SHOP_SUCCESS);
+    }
+
+    /**
+     * 发送取消订单消息
+     *
+     * @param cancelMsg 待发送的取消订单信息
+     */
+    private void sendCancelOrderMsg(CancelOrderMsg cancelMsg) {
+        log.info("发送取消订单消息");
+        SendResult sendResult = mqTemplate.syncSend(this.getCancelOrderMsgDestination(), MessageBuilder.withPayload(cancelMsg).build());
+        log.info("发送结果：{}", sendResult);
+    }
+
+    /**
+     * 获取取消订单消息的目的地，格式：Topic:Tag
+     *
+     * @return 取消订单消息目的地
+     */
+    private String getCancelOrderMsgDestination() {
+        return String.join(":", orderMsgProperties.getTopic(), orderMsgProperties.getTag().getCancel());
     }
 
     /**
