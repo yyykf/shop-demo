@@ -44,4 +44,4 @@ order:
   topic: ORDER_MSG
   tag:
     confirm: order_confirm
-    cancel:
+    cancel: order_cancel
