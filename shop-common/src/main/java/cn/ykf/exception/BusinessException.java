@@ -27,4 +27,16 @@ public class BusinessException extends RuntimeException {
         log.error("{}", code);
         throw new BusinessException(code);
     }
+
+    /**
+     * 将状态码转换为业务异常
+     *
+     * @param code 状态码
+     * @param desc 额外描述信息
+     * @param args 上下文参数
+     */
+    public static void cast(ShopCode code, String desc, Object... args) {
+        log.error("{}, desc: {}, args: {}", code, desc, args);
+        throw new BusinessException(code);
+    }
 }

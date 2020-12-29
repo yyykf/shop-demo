@@ -1,7 +1,10 @@
 package cn.ykf.model;
 
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 
+@NoArgsConstructor
 public class TradeMqConsumerLog extends TradeMqConsumerLogKey {
     private String msgId;
 
@@ -14,6 +17,16 @@ public class TradeMqConsumerLog extends TradeMqConsumerLogKey {
     private Date consumerTimestamp;
 
     private String remark;
+
+    public TradeMqConsumerLog(String groupName, String msgTag, String msgKey, String msgId, String msgBody, Integer consumerStatus, Integer consumerTimes, Date consumerTimestamp, String remark) {
+        super(groupName, msgTag, msgKey);
+        this.msgId = msgId;
+        this.msgBody = msgBody;
+        this.consumerStatus = consumerStatus;
+        this.consumerTimes = consumerTimes;
+        this.consumerTimestamp = consumerTimestamp;
+        this.remark = remark;
+    }
 
     public String getMsgId() {
         return msgId;

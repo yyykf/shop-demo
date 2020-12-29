@@ -9,6 +9,15 @@ public class TradeMqConsumerLogKey implements Serializable {
 
     private String msgKey;
 
+    public TradeMqConsumerLogKey() {
+    }
+
+    public TradeMqConsumerLogKey(String groupName, String msgTag, String msgKey) {
+        this.groupName = groupName;
+        this.msgTag = msgTag;
+        this.msgKey = msgKey;
+    }
+
     public String getGroupName() {
         return groupName;
     }
