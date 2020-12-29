@@ -79,7 +79,7 @@ CREATE TABLE `trade_mq_consumer_log` (
   `msg_key` varchar(100) NOT NULL,
   `msg_body` varchar(500) DEFAULT NULL,
   `consumer_status` int(1) DEFAULT NULL COMMENT '0:正在处理;1:处理成功;2:处理失败',
-  `consumer_times` int(1) DEFAULT NULL,
+  `consumer_times` int(1) DEFAULT 0 COMMENT '重试次数',
   `consumer_timestamp` timestamp NULL DEFAULT NULL,
   `remark` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`group_name`,`msg_tag`,`msg_key`)
