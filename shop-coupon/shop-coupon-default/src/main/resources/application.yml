@@ -34,3 +34,11 @@ dubbo:
   provider:
     timeout: 10000
     retries: 0
+
+rocketmq:
+  name-server: 172.16.61.100:9876;172.16.61.101:9876
+
+mq:
+  order:
+    topic: ORDER_MSG
+    consumer: CouponConsumerForCancelOrder

@@ -1,4 +1,4 @@
-package cn.ykf.model;
+package cn.ykf.entity;
 
 import lombok.NoArgsConstructor;
 

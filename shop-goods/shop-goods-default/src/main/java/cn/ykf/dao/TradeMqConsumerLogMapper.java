@@ -1,10 +1,11 @@
 package cn.ykf.dao;
 
-import cn.ykf.model.TradeMqConsumerLog;
-import cn.ykf.model.TradeMqConsumerLogExample;
-import cn.ykf.model.TradeMqConsumerLogKey;
-import java.util.List;
+import cn.ykf.entity.TradeMqConsumerLog;
+import cn.ykf.entity.TradeMqConsumerLogExample;
+import cn.ykf.entity.TradeMqConsumerLogKey;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface TradeMqConsumerLogMapper {
     int countByExample(TradeMqConsumerLogExample example);

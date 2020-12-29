@@ -40,6 +40,8 @@ import java.util.Objects;
 @DubboService
 public class OrderServiceImpl implements OrderService {
 
+    private static final int FREE_SHIPPING_FEE_THRESHOLD = 100;
+
     @DubboReference(check = false)
     private CouponService couponService;
 
@@ -235,7 +237,7 @@ public class OrderServiceImpl implements OrderService {
             BusinessException.cast(ShopCode.SHOP_ORDER_TOP_PRICE_INVALID);
         }
 
-        if (BigDecimal.valueOf(100).compareTo(orderAmount) <= 0) {
+        if (BigDecimal.valueOf(FREE_SHIPPING_FEE_THRESHOLD).compareTo(orderAmount) <= 0) {
             return BigDecimal.ZERO;
         }
 

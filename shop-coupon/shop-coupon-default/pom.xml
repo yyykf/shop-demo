@@ -19,6 +19,11 @@
             <version>${project.parent.version}</version>
         </dependency>
 
+        <!-- RocketMQ Starter -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+        </dependency>
         <!-- Dubbo Spring Boot Starter -->
         <dependency>
             <groupId>org.apache.dubbo</groupId>
