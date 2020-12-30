@@ -18,6 +18,8 @@ import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -35,6 +37,9 @@ public class GoodsServiceImpl implements GoodsService {
 
     /** 取消订单最大重试次数 */
     private static final Integer CANCEL_ORDER_MSG_MAX_RETRY_TIMES = 3;
+
+    @Resource
+    private GoodsService self;
 
     @Resource
     private TradeGoodsMapper goodsMapper;
@@ -94,9 +99,11 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void handlerCancelOrderMsg(String tags, String msgId, String keys, String body, String consumerGroup) {
         if (StringUtils.isAnyBlank(tags, keys, consumerGroup, msgId, body)) {
-            log.error("消息必需参数不完整, tags: {}, keys: {}, consumerGroup: {}, msgId: {}, body: {}", tags, keys, consumerGroup, msgId, body);
+            log.error("消息必需参数不完整, tags: {}, keys: {}, consumerGroup: {}, msgId: {}, body: {}", tags, keys,
+                    consumerGroup, msgId, body);
             BusinessException.cast(ShopCode.SHOP_REQUEST_PARAMETER_VALID);
         }
 
@@ -108,31 +115,22 @@ public class GoodsServiceImpl implements GoodsService {
 
         try {
             // 保存日志
-            if (!this.saveConsumerLog(tags, msgId, keys, body, consumerGroup)) {
+            if (!self.saveConsumerLog(tags, msgId, keys, body, consumerGroup)) {
                 return;
             }
 
             // 回退库存
-            this.rollbackGoodsStock(cancelOrderMsg.getGoodsId(), cancelOrderMsg.getGoodsNum());
-
-            // 记录库存操作日志
-            TradeGoodsNumberLog goodsNumberLog = new TradeGoodsNumberLog(cancelOrderMsg.getGoodsId(),
-                    cancelOrderMsg.getOrderId(), ShopCode.SHOP_GOODS_ROLLBACK.getCode(), cancelOrderMsg.getGoodsNum());
-            goodsNumberLog.setLogTime(new Date());
-            logMapper.insert(goodsNumberLog);
+            self.rollbackGoodsStock(cancelOrderMsg.getGoodsId(), cancelOrderMsg.getGoodsNum(),
+                    cancelOrderMsg.getOrderId());
 
             // 更新消费日志
-            this.updateConsumerLogToSuccess(tags, keys, consumerGroup);
-
+            self.updateConsumerLogToSuccess(tags, keys, consumerGroup);
             log.info("商品 {} 回退库存成功", cancelOrderMsg.getGoodsId());
         } catch (Exception e) {
+            log.error("异常信息", e);
+
             // 消费失败
-            TradeMqConsumerLog consumerLog = consumerLogMapper.selectByPrimaryKey(new TradeMqConsumerLogKey(consumerGroup, tags, keys));
-            if (consumerLog != null) {
-                consumerLog.setConsumerTimes(consumerLog.getConsumerTimes() + 1);
-                consumerLog.setConsumerStatus(ShopCode.SHOP_MQ_MESSAGE_STATUS_FAIL.getCode());
-                consumerLogMapper.updateByPrimaryKeySelective(consumerLog);
-            }
+            self.updateConsumerLogToFail(tags, keys, consumerGroup);
 
             log.error("商品 {} 回退库存失败，等待重试", cancelOrderMsg.getGoodsId());
             // 让MQ重新投递
@@ -142,14 +140,13 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     /**
-     * 更新消费日志为操作成功
-     *
-     * @param tags          消息tag
-     * @param keys          消息key
-     * @param consumerGroup 消费组名
+     * {@inheritDoc} 无事务，避免回滚
      */
-    private void updateConsumerLogToSuccess(String tags, String keys, String consumerGroup) {
-        TradeMqConsumerLog consumerLog = consumerLogMapper.selectByPrimaryKey(new TradeMqConsumerLogKey(consumerGroup, tags, keys));
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void updateConsumerLogToSuccess(String tags, String keys, String consumerGroup) {
+        TradeMqConsumerLog consumerLog = consumerLogMapper.selectByPrimaryKey(new TradeMqConsumerLogKey(consumerGroup
+                , tags, keys));
         consumerLog.setConsumerStatus(ShopCode.SHOP_MQ_MESSAGE_STATUS_SUCCESS.getCode());
         consumerLog.setConsumerTimestamp(new Date());
 
@@ -158,14 +155,26 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     /**
-     * 回退库存
-     *
-     * @param goodsId  商品id
-     * @param goodsNum 回退数量
+     * {@inheritDoc} 无事务，避免回滚
      */
-    private void rollbackGoodsStock(Long goodsId, Integer goodsNum) {
-        if (goodsId == null || goodsNum == null) {
-            BusinessException.cast(ShopCode.SHOP_REQUEST_PARAMETER_VALID, "商品id-回退数量", goodsId, goodsNum);
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void updateConsumerLogToFail(String tags, String keys, String consumerGroup) {
+        TradeMqConsumerLog consumerLog =
+                consumerLogMapper.selectByPrimaryKey(new TradeMqConsumerLogKey(consumerGroup, tags, keys));
+        if (consumerLog != null) {
+            consumerLog.setConsumerTimes(consumerLog.getConsumerTimes() + 1);
+            consumerLog.setConsumerStatus(ShopCode.SHOP_MQ_MESSAGE_STATUS_FAIL.getCode());
+            consumerLogMapper.updateByPrimaryKeySelective(consumerLog);
+        }
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void rollbackGoodsStock(Long goodsId, Integer goodsNum, Long orderId) {
+        if (goodsId == null || goodsNum == null || orderId == null) {
+            BusinessException.cast(ShopCode.SHOP_REQUEST_PARAMETER_VALID, "商品id-回退数量-订单id", goodsId, goodsNum, orderId);
         }
 
         TradeGoods goods = goodsMapper.selectByPrimaryKey(goodsId);
@@ -185,26 +194,30 @@ public class GoodsServiceImpl implements GoodsService {
             log.error("回退库存失败，商品 {} 库存被并发更新，需要重试", goodsId);
             BusinessException.cast(ShopCode.SHOP_MQ_MESSAGE_STATUS_FAIL);
         }
+
+        // 记录库存操作日志
+        TradeGoodsNumberLog goodsNumberLog = new TradeGoodsNumberLog(goodsId, orderId,
+                ShopCode.SHOP_GOODS_ROLLBACK.getCode(), goodsNum);
+        goodsNumberLog.setLogTime(new Date());
+        logMapper.insert(goodsNumberLog);
     }
 
     /**
-     * 保存消费日志
-     *
-     * @param tags          消息tag
-     * @param msgId         消息id
-     * @param keys          消息key
-     * @param body          消息体
-     * @param consumerGroup 消费组名
-     * @return 成功 - {@code true}，失败 - {@code false}
+     * {@inheritDoc} 无事务，避免回滚
      */
-    private boolean saveConsumerLog(String tags, String msgId, String keys, String body, String consumerGroup) {
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public boolean saveConsumerLog(String tags, String msgId, String keys, String body, String consumerGroup) {
         // 查询消息消费记录
-        TradeMqConsumerLog consumerLog = consumerLogMapper.selectByPrimaryKey(new TradeMqConsumerLogKey(consumerGroup, tags, keys));
+        TradeMqConsumerLog consumerLog = consumerLogMapper.selectByPrimaryKey(new TradeMqConsumerLogKey(consumerGroup
+                , tags, keys));
 
         if (consumerLog != null) {
             // 处理成功或者正在处理，结束
-            boolean alreadyProcess = Objects.equals(ShopCode.SHOP_MQ_MESSAGE_STATUS_SUCCESS.getCode(), consumerLog.getConsumerStatus())
-                    || Objects.equals(ShopCode.SHOP_MQ_MESSAGE_STATUS_PROCESSING.getCode(), consumerLog.getConsumerStatus());
+            boolean alreadyProcess = Objects.equals(ShopCode.SHOP_MQ_MESSAGE_STATUS_SUCCESS.getCode(),
+                    consumerLog.getConsumerStatus())
+                    || Objects.equals(ShopCode.SHOP_MQ_MESSAGE_STATUS_PROCESSING.getCode(),
+                    consumerLog.getConsumerStatus());
             if (alreadyProcess) {
                 log.info("消息 {} 正在处理或已经处理", msgId);
                 return false;
@@ -233,7 +246,8 @@ public class GoodsServiceImpl implements GoodsService {
             return result > 0;
         }
 
-        consumerLog = new TradeMqConsumerLog(consumerGroup, tags, keys, msgId, body, ShopCode.SHOP_MQ_MESSAGE_STATUS_PROCESSING.getCode(), 0, null, null);
+        consumerLog = new TradeMqConsumerLog(consumerGroup, tags, keys, msgId, body,
+                ShopCode.SHOP_MQ_MESSAGE_STATUS_PROCESSING.getCode(), 0, null, null);
         return consumerLogMapper.insertSelective(consumerLog) > 0;
     }
 }
