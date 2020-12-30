@@ -125,10 +125,10 @@ public class UserServiceImpl implements UserService {
             this.updateMoneyPaid(userMoneyLog);
 
             // todo 更新消费日志
-            log.info("优惠券 {} 返还成功", cancelOrderMsg.getCouponId());
+            log.info("用户余额 {} 退还成功", cancelOrderMsg.getCouponId());
         } catch (Exception e) {
             // todo 消费失败，修改消费日志状态
-            log.error("优惠券 {} 返还失败，等待重试", cancelOrderMsg.getCouponId());
+            log.error("用户余额 {} 退还失败，等待重试", cancelOrderMsg.getCouponId());
             // 让MQ重新投递
             BusinessException.cast(ShopCode.SHOP_MQ_MESSAGE_STATUS_FAIL);
         }

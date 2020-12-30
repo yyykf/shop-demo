@@ -14,6 +14,7 @@ import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.apache.rocketmq.spring.core.RocketMQPushConsumerLifecycleListener;
 import org.apache.rocketmq.spring.support.DefaultRocketMQListenerContainer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
@@ -26,6 +27,7 @@ import java.util.List;
  * @date 2020/12/29
  */
 @Slf4j
+@Component
 @RocketMQMessageListener(consumerGroup = "${mq.order.consumer}", topic = "${mq.order.topic}")
 public class CancelOrderMsgListener implements RocketMQListener<MessageExt>, RocketMQPushConsumerLifecycleListener {
 
@@ -40,7 +42,8 @@ public class CancelOrderMsgListener implements RocketMQListener<MessageExt>, Roc
 
     /**
      * 无需返回值，如果消费失败抛出异常即可，MQ会尝试重新投递
-     * 消费逻辑 {@link DefaultRocketMQListenerContainer.DefaultMessageListenerConcurrently#consumeMessage(List, ConsumeConcurrentlyContext)}
+     * 消费逻辑
+     * {@link DefaultRocketMQListenerContainer.DefaultMessageListenerConcurrently#consumeMessage(List, ConsumeConcurrentlyContext)}
      *
      * @param message 待消息消息
      */
