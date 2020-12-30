@@ -34,3 +34,8 @@ dubbo:
   provider:
     timeout: 10000
     retries: 0
+
+mq:
+  order:
+    topic: ORDER_MSG
+    consumer: UserConsumerForCancelOrder

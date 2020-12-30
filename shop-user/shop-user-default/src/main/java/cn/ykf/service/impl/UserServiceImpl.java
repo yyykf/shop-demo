@@ -3,12 +3,16 @@ package cn.ykf.service.impl;
 import cn.ykf.constant.ShopCode;
 import cn.ykf.dao.TradeUserMapper;
 import cn.ykf.dao.TradeUserMoneyLogMapper;
+import cn.ykf.entity.CancelOrderMsg;
 import cn.ykf.entity.Result;
 import cn.ykf.exception.BusinessException;
 import cn.ykf.model.TradeUser;
 import cn.ykf.model.TradeUserMoneyLog;
 import cn.ykf.model.TradeUserMoneyLogExample;
 import cn.ykf.service.UserService;
+import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
@@ -23,6 +27,7 @@ import java.util.Objects;
  * @author YuKaiFan <1092882580@qq.com>
  * @date 2020/12/24
  */
+@Slf4j
 @DubboService
 public class UserServiceImpl implements UserService {
 
@@ -53,6 +58,7 @@ public class UserServiceImpl implements UserService {
 
         TradeUser user = userMapper.selectByPrimaryKey(userMoneyLog.getUserId());
         if (user == null) {
+            log.error("用户 {} 不存在", userMoneyLog.getUserId());
             BusinessException.cast(ShopCode.SHOP_USER_NO_EXIST);
         }
 
@@ -80,7 +86,8 @@ public class UserServiceImpl implements UserService {
                 BusinessException.cast(ShopCode.SHOP_ORDER_PAY_STATUS_NO_PAY);
             }
             // 已经退过款
-            if (logs.stream().anyMatch(log -> Objects.equals(ShopCode.SHOP_USER_MONEY_REFUND.getCode(), log.getMoneyLogType()))) {
+            if (logs.stream().anyMatch(log -> Objects.equals(ShopCode.SHOP_USER_MONEY_REFUND.getCode(),
+                    log.getMoneyLogType()))) {
                 BusinessException.cast(ShopCode.SHOP_USER_MONEY_REFUND_ALREADY);
             }
 
@@ -92,5 +99,38 @@ public class UserServiceImpl implements UserService {
         userMoneyLogMapper.insert(userMoneyLog);
 
         return Result.of(ShopCode.SHOP_SUCCESS);
+    }
+
+    @Override
+    public void handlerCancelOrderMsg(String tags, String msgId, String keys, String body, String consumerGroup) {
+        // todo 方法能不能抽取到common？但是会导致common引入mybatis
+        if (StringUtils.isAnyBlank(tags, keys, consumerGroup, msgId, body)) {
+            log.error("消息必需参数不完整, tags: {}, keys: {}, consumerGroup: {}, msgId: {}, body: {}", tags, keys,
+                    consumerGroup, msgId, body);
+            BusinessException.cast(ShopCode.SHOP_REQUEST_PARAMETER_VALID);
+        }
+
+        CancelOrderMsg cancelOrderMsg = JSON.parseObject(body, CancelOrderMsg.class);
+        if (cancelOrderMsg == null) {
+            log.error("消息体反序列化为空, {}", body);
+            BusinessException.cast(ShopCode.SHOP_MQ_MESSAGE_STATUS_FAIL);
+        }
+
+        try {
+            // todo 保存日志
+            // 回退余额
+            TradeUserMoneyLog userMoneyLog = new TradeUserMoneyLog(cancelOrderMsg.getUserId(),
+                    cancelOrderMsg.getOrderId(), ShopCode.SHOP_USER_MONEY_REFUND.getCode(),
+                    cancelOrderMsg.getUserMoney());
+            this.updateMoneyPaid(userMoneyLog);
+
+            // todo 更新消费日志
+            log.info("优惠券 {} 返还成功", cancelOrderMsg.getCouponId());
+        } catch (Exception e) {
+            // todo 消费失败，修改消费日志状态
+            log.error("优惠券 {} 返还失败，等待重试", cancelOrderMsg.getCouponId());
+            // 让MQ重新投递
+            BusinessException.cast(ShopCode.SHOP_MQ_MESSAGE_STATUS_FAIL);
+        }
     }
 }
