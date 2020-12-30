@@ -86,7 +86,7 @@ public class GoodsServiceImpl implements GoodsService {
         }
 
         // 记录日志，扣减，数量应该为负数
-        goods.setGoodsNumber(-(goodsNumberLog.getGoodsNumber()));
+        goodsNumberLog.setGoodsNumber(-needStock);
         goodsNumberLog.setLogTime(new Date());
         logMapper.insert(goodsNumberLog);
 
