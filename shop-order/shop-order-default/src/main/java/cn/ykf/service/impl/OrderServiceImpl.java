@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.common.message.MessageConst;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.messaging.support.MessageBuilder;
 
@@ -137,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
     private void sendCancelOrderMsg(CancelOrderMsg cancelMsg) {
         log.info("发送取消订单消息");
         SendResult sendResult = mqTemplate.syncSend(this.getCancelOrderMsgDestination(),
-                MessageBuilder.withPayload(cancelMsg).build());
+                MessageBuilder.withPayload(cancelMsg).setHeader(MessageConst.PROPERTY_KEYS, cancelMsg.getOrderId()).build());
         log.info("发送结果：{}", sendResult);
     }
 
