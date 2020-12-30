@@ -226,7 +226,7 @@ public class OrderServiceImpl implements OrderService {
      */
     private void reduceGoodsStock(TradeOrder order) {
         TradeGoodsNumberLog goodsNumberLog = new TradeGoodsNumberLog(order.getGoodsId(), order.getOrderId(),
-                order.getGoodsNumber());
+                ShopCode.SHOP_GOODS_SALE.getCode(), order.getGoodsNumber());
         Result result = goodsService.reduceGoodsStock(goodsNumberLog);
 
         if (ShopCode.SHOP_FAIL.getSuccess().equals(result.getSuccess())) {

@@ -15,6 +15,10 @@ public enum ShopCode {
     SHOP_USER_MONEY_PAID(true, 1, "付款"),
     /** 退款 */
     SHOP_USER_MONEY_REFUND(true, 2, "退款"),
+    /** 商品出库 */
+    SHOP_GOODS_SALE(true, 1, "出库"),
+    /** 商品入库 */
+    SHOP_GOODS_ROLLBACK(true, 2, "入库"),
     /** 订单未确认 */
     SHOP_ORDER_NO_CONFIRM(false, 0, "订单未确认"),
     /** 订单已确认 */

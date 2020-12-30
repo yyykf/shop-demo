@@ -37,7 +37,7 @@ public class CancelOrderMsgListener implements RocketMQListener<MessageExt>, Roc
     /**
      * 消费组名
      */
-    @Value("${mq.order.consumer}")
+    @Value("${order.consumer}")
     private String consumerGroup;
 
     /**

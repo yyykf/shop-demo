@@ -10,8 +10,8 @@ public class TradeGoodsNumberLog extends TradeGoodsNumberLogKey {
     public TradeGoodsNumberLog() {
     }
 
-    public TradeGoodsNumberLog(Long goodsId, Long orderId, Integer goodsNumber) {
-        super(goodsId, orderId);
+    public TradeGoodsNumberLog(Long goodsId, Long orderId, Integer goodsLogType, Integer goodsNumber) {
+        super(goodsId, orderId, goodsLogType);
         this.goodsNumber = goodsNumber;
     }
 

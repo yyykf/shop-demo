@@ -61,6 +61,7 @@ public class GoodsServiceImpl implements GoodsService {
         if (goodsNumberLog == null ||
                 goodsNumberLog.getGoodsId() == null ||
                 goodsNumberLog.getOrderId() == null ||
+                goodsNumberLog.getGoodsLogType() == null ||
                 goodsNumberLog.getGoodsNumber() == null) {
             BusinessException.cast(ShopCode.SHOP_REQUEST_PARAMETER_VALID);
         }
@@ -85,8 +86,7 @@ public class GoodsServiceImpl implements GoodsService {
             BusinessException.cast(ShopCode.SHOP_REDUCE_GOODS_NUM_FAIL);
         }
 
-        // 记录日志，扣减，数量应该为负数
-        goodsNumberLog.setGoodsNumber(-needStock);
+        // 记录日志
         goodsNumberLog.setLogTime(new Date());
         logMapper.insert(goodsNumberLog);
 
@@ -116,7 +116,8 @@ public class GoodsServiceImpl implements GoodsService {
             this.rollbackGoodsStock(cancelOrderMsg.getGoodsId(), cancelOrderMsg.getGoodsNum());
 
             // 记录库存操作日志
-            TradeGoodsNumberLog goodsNumberLog = new TradeGoodsNumberLog(cancelOrderMsg.getGoodsId(), cancelOrderMsg.getOrderId(), cancelOrderMsg.getGoodsNum());
+            TradeGoodsNumberLog goodsNumberLog = new TradeGoodsNumberLog(cancelOrderMsg.getGoodsId(),
+                    cancelOrderMsg.getOrderId(), ShopCode.SHOP_GOODS_ROLLBACK.getCode(), cancelOrderMsg.getGoodsNum());
             goodsNumberLog.setLogTime(new Date());
             logMapper.insert(goodsNumberLog);
 

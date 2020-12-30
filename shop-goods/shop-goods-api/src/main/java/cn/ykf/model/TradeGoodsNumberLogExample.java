@@ -226,6 +226,66 @@ public class TradeGoodsNumberLogExample implements Serializable {
             return (Criteria) this;
         }
 
+        public Criteria andgoodsLogTypeIsNull() {
+            addCriterion("goods_log_type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoodsLogTypeIsNotNull() {
+            addCriterion("goods_log_type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoodsLogTypeEqualTo(Integer value) {
+            addCriterion("goods_log_type =", value, "goodsLogType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoodsLogTypeNotEqualTo(Integer value) {
+            addCriterion("goods_log_type <>", value, "goodsLogType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoodsLogTypeGreaterThan(Integer value) {
+            addCriterion("goods_log_type >", value, "goodsLogType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoodsLogTypeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("goods_log_type >=", value, "goodsLogType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoodsLogTypeLessThan(Integer value) {
+            addCriterion("goods_log_type <", value, "goodsLogType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoodsLogTypeLessThanOrEqualTo(Integer value) {
+            addCriterion("goods_log_type <=", value, "goodsLogType");
+            return (Criteria) this;
+        }
+
+        public Criteria andgoodsLogTypeIn(List<Integer> values) {
+            addCriterion("goods_log_type in", values, "goodsLogType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoodsLogTypeNotIn(List<Integer> values) {
+            addCriterion("goods_log_type not in", values, "goodsLogType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoodsLogTypeBetween(Integer value1, Integer value2) {
+            addCriterion("goods_log_type between", value1, value2, "goodsLogType");
+            return (Criteria) this;
+        }
+
+        public Criteria andGoodsLogTypeNotBetween(Integer value1, Integer value2) {
+            addCriterion("goods_log_type not between", value1, value2, "goodsLogType");
+            return (Criteria) this;
+        }
+
         public Criteria andGoodsNumberIsNull() {
             addCriterion("goods_number is null");
             return (Criteria) this;

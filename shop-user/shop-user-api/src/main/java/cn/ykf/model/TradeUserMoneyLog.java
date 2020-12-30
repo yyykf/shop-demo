@@ -8,13 +8,18 @@ public class TradeUserMoneyLog extends TradeUserMoneyLogKey {
 
     private Date createTime;
 
-    public TradeUserMoneyLog(BigDecimal useMoney) {
-        this.useMoney = useMoney;
+    public TradeUserMoneyLog() {
     }
 
     public TradeUserMoneyLog(Long userId, Long orderId, Integer moneyLogType, BigDecimal useMoney) {
         super(userId, orderId, moneyLogType);
         this.useMoney = useMoney;
+    }
+
+    public TradeUserMoneyLog(Long userId, Long orderId, Integer moneyLogType, BigDecimal useMoney, Date createTime) {
+        super(userId, orderId, moneyLogType);
+        this.useMoney = useMoney;
+        this.createTime = createTime;
     }
 
     public BigDecimal getUseMoney() {

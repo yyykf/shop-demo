@@ -61,8 +61,9 @@ CREATE TABLE `trade_goods_number_log` (
   `goods_id` bigint(50) NOT NULL COMMENT '商品ID',
   `order_id` bigint(50) NOT NULL COMMENT '订单ID',
   `goods_number` int(11) DEFAULT NULL COMMENT '库存数量',
+  `goods_log_type` int(1) NOT NULL COMMENT '日志类型 1出库 2入库',
   `log_time` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`goods_id`,`order_id`),
+  PRIMARY KEY (`goods_id`,`order_id`, `goods_log_type`),
   KEY `FK_trade_goods_number_log2` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

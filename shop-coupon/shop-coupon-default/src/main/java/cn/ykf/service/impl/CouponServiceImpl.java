@@ -70,7 +70,7 @@ public class CouponServiceImpl implements CouponService {
 
         try {
             // todo 保存日志
-            // 回退库存
+            // 返还优惠券
             this.returnCoupon(cancelOrderMsg.getCouponId());
 
             // todo 更新消费日志

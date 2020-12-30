@@ -12,6 +12,8 @@ public class TradeGoodsNumberLogKey implements Serializable {
 
     private Long orderId;
 
+    private Integer goodsLogType;
+
     public Long getGoodsId() {
         return goodsId;
     }
@@ -26,5 +28,13 @@ public class TradeGoodsNumberLogKey implements Serializable {
 
     public void setOrderId(Long orderId) {
         this.orderId = orderId;
+    }
+
+    public Integer getGoodsLogType() {
+        return goodsLogType;
+    }
+
+    public void setGoodsLogType(Integer goodsLogType) {
+        this.goodsLogType = goodsLogType;
     }
 }
