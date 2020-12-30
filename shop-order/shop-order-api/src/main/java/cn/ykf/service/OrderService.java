@@ -18,4 +18,15 @@ public interface OrderService {
      * @return Order
      */
     Result confirmOrder(TradeOrder order);
+
+    /**
+     * 处理取消订单消息
+     *
+     * @param tags          消息tag
+     * @param msgId         消息id
+     * @param keys          消息key
+     * @param body          消息内容
+     * @param consumerGroup 消费组名
+     */
+    void handlerCancelOrderMsg(String tags, String msgId, String keys, String body, String consumerGroup);
 }

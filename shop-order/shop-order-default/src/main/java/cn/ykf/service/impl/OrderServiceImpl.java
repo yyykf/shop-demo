@@ -17,13 +17,14 @@ import cn.ykf.service.GoodsService;
 import cn.ykf.service.OrderService;
 import cn.ykf.service.UserService;
 import cn.ykf.util.IdHelper;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -74,6 +75,8 @@ public class OrderServiceImpl implements OrderService {
             this.updateCouponStatus(order);
             // 使用余额
             this.reduceMoneyPaid(order);
+            // 模拟执行出错
+            BusinessException.cast(ShopCode.SHOP_FAIL);
             // 确认订单
             this.updateOrderStatus(order);
 
@@ -81,12 +84,49 @@ public class OrderServiceImpl implements OrderService {
         } catch (Exception e) {
             log.error("确认订单失败，准备回滚", e);
 
-            CancelOrderMsg cancelMsg = CancelOrderMsg.of(orderId, order.getCouponId(), order.getUserId(), order.getMoneyPaid(), order.getGoodsId(), order.getGoodsNumber());
+            CancelOrderMsg cancelMsg = CancelOrderMsg.of(orderId, order.getCouponId(), order.getUserId(),
+                    order.getMoneyPaid(), order.getGoodsId(), order.getGoodsNumber());
             this.sendCancelOrderMsg(cancelMsg);
 
             return Result.of(ShopCode.SHOP_FAIL);
         }
         return Result.of(ShopCode.SHOP_SUCCESS);
+    }
+
+    @Override
+    public void handlerCancelOrderMsg(String tags, String msgId, String keys, String body, String consumerGroup) {
+        // todo 方法能不能抽取到common？但是会导致common引入mybatis
+        if (StringUtils.isAnyBlank(tags, keys, consumerGroup, msgId, body)) {
+            log.error("消息必需参数不完整, tags: {}, keys: {}, consumerGroup: {}, msgId: {}, body: {}", tags, keys,
+                    consumerGroup, msgId, body);
+            BusinessException.cast(ShopCode.SHOP_REQUEST_PARAMETER_VALID);
+        }
+
+        CancelOrderMsg cancelOrderMsg = JSON.parseObject(body, CancelOrderMsg.class);
+        if (cancelOrderMsg == null) {
+            log.error("消息体反序列化为空, {}", body);
+            BusinessException.cast(ShopCode.SHOP_MQ_MESSAGE_STATUS_FAIL);
+        }
+
+        try {
+            // todo 保存日志
+            // 取消订单
+            TradeOrder order = orderMapper.selectByPrimaryKey(cancelOrderMsg.getOrderId());
+            if (order == null) {
+                log.info("待取消订单 {} 不存在", cancelOrderMsg.getOrderId());
+                return;
+            }
+            order.setOrderStatus(ShopCode.SHOP_ORDER_CANCEL.getCode());
+            orderMapper.updateByPrimaryKeySelective(order);
+
+            // todo 更新消费日志
+            log.info("订单 {} 取消成功", cancelOrderMsg.getCouponId());
+        } catch (Exception e) {
+            // todo 消费失败，修改消费日志状态
+            log.error("订单 {} 取消失败，等待重试", cancelOrderMsg.getCouponId());
+            // 让MQ重新投递
+            BusinessException.cast(ShopCode.SHOP_MQ_MESSAGE_STATUS_FAIL);
+        }
     }
 
     /**
@@ -96,7 +136,8 @@ public class OrderServiceImpl implements OrderService {
      */
     private void sendCancelOrderMsg(CancelOrderMsg cancelMsg) {
         log.info("发送取消订单消息");
-        SendResult sendResult = mqTemplate.syncSend(this.getCancelOrderMsgDestination(), MessageBuilder.withPayload(cancelMsg).build());
+        SendResult sendResult = mqTemplate.syncSend(this.getCancelOrderMsgDestination(),
+                MessageBuilder.withPayload(cancelMsg).build());
         log.info("发送结果：{}", sendResult);
     }
 
@@ -153,7 +194,7 @@ public class OrderServiceImpl implements OrderService {
      * @param order 订单
      */
     private void updateCouponStatus(TradeOrder order) {
-        if (order == null || StringUtils.isEmpty(order.getCouponId())) {
+        if (order == null || order.getCouponId() == null) {
             return;
         }
 
@@ -184,7 +225,8 @@ public class OrderServiceImpl implements OrderService {
      * @param order 包含待操作商品的订单信息
      */
     private void reduceGoodsStock(TradeOrder order) {
-        TradeGoodsNumberLog goodsNumberLog = new TradeGoodsNumberLog(order.getGoodsId(), order.getOrderId(), order.getGoodsNumber());
+        TradeGoodsNumberLog goodsNumberLog = new TradeGoodsNumberLog(order.getGoodsId(), order.getOrderId(),
+                order.getGoodsNumber());
         Result result = goodsService.reduceGoodsStock(goodsNumberLog);
 
         if (ShopCode.SHOP_FAIL.getSuccess().equals(result.getSuccess())) {
