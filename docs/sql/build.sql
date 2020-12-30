@@ -147,7 +147,7 @@ CREATE TABLE `trade_pay` (
   `pay_id` bigint(50) NOT NULL COMMENT '支付编号',
   `order_id` bigint(50) DEFAULT NULL COMMENT '订单编号',
   `pay_amount` decimal(10,2) DEFAULT NULL COMMENT '支付金额',
-  `is_paid` int(1) DEFAULT NULL COMMENT '是否已支付 1否 2是',
+  `is_paid` int(1) DEFAULT NULL COMMENT '是否已支付 0未支付 1正在支付 2已支付',
   PRIMARY KEY (`pay_id`),
   KEY `FK_trade_pay` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

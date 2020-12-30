@@ -298,7 +298,7 @@ public class OrderServiceImpl implements OrderService {
         // 设置订单状态为不可见
         order.setOrderStatus(ShopCode.SHOP_ORDER_NO_CONFIRM.getCode());
         // 订单ID
-        order.setOrderId(IdHelper.getNewId(orderMapper.getClass()));
+        order.setOrderId(IdHelper.getNewId(TradeOrderMapper.class));
         // 运费是否正确
         BigDecimal shippingFee = this.calculateShippingFee(order.getOrderAmount());
         if (order.getShippingFee().compareTo(shippingFee) != 0) {
