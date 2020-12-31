@@ -48,3 +48,5 @@ order:
   consumer: OrderConsumer
 pay:
   topic: PAY_MSG
+  # 不要使用相同的consumer group，因为本质上订阅的不是同一个topic，不是同一个消费组
+  consumer: OrderConsumerForPay

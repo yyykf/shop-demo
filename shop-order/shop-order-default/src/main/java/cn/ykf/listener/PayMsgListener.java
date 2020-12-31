@@ -21,7 +21,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Component
-@RocketMQMessageListener(topic = "${pay.topic}", consumerGroup = "${order.consumer}")
+@RocketMQMessageListener(topic = "${pay.topic}", consumerGroup = "${pay.consumer}")
 public class PayMsgListener implements RocketMQListener<Message<PayVo>>, RocketMQPushConsumerLifecycleListener {
 
     @Resource
