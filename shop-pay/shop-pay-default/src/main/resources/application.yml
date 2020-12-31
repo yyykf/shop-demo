@@ -34,3 +34,13 @@ dubbo:
   provider:
     timeout: 10000
     retries: 0
+
+rocketmq:
+  name-server: 172.16.61.100:9876;172.16.61.101:9876
+  producer:
+    group: PayProducer
+
+## 支付成功消息Topic
+pay:
+  topic: PAY_MSG
+  tag: success

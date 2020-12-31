@@ -18,4 +18,28 @@ public interface PayService {
      * @return Result
      */
     Result createPayment(TradePay tradePay);
+
+    /**
+     * 支付成功回调
+     *
+     * @param tradePay 含有订单id
+     * @return Result
+     */
+    Result callbackPayment(TradePay tradePay);
+
+    /**
+     * 更新支付订单状态为支付成功
+     *
+     * @param payId 支付订单id
+     * @return Result
+     */
+    Result updatePaymentToSuccess(Long payId);
+
+    /**
+     * 检查订单是否已支付
+     *
+     * @param payId 订单id
+     * @return 已支付 - {@code true}， 未支付 - {@code false}
+     */
+    boolean checkPayIsPaid(Long payId);
 }
