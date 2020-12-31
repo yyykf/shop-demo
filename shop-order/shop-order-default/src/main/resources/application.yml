@@ -46,3 +46,5 @@ order:
     confirm: order_confirm
     cancel: order_cancel
   consumer: OrderConsumer
+pay:
+  topic: PAY_MSG

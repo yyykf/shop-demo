@@ -33,6 +33,11 @@
             <artifactId>shop-coupon-api</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.ykf</groupId>
+            <artifactId>shop-pay-api</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
 
         <!-- RocketMQ Starter -->
         <dependency>

@@ -130,6 +130,25 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
+    public void updateOrderToIsPaid(Long orderId) {
+        if (orderId == null) {
+            log.info("订单id为空");
+            return;
+        }
+
+        TradeOrder order = orderMapper.selectByPrimaryKey(orderId);
+        if (order == null) {
+            log.info("{} 对应订单不存在", orderId);
+            return;
+        }
+
+        order.setOrderStatus(ShopCode.SHOP_ORDER_PAY_STATUS_IS_PAY.getCode());
+        orderMapper.updateByPrimaryKey(order);
+
+        log.info("更新订单支付状态成功");
+    }
+
     /**
      * 发送取消订单消息
      *

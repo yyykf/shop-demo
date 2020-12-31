@@ -29,4 +29,11 @@ public interface OrderService {
      * @param consumerGroup 消费组名
      */
     void handlerCancelOrderMsg(String tags, String msgId, String keys, String body, String consumerGroup);
+
+    /**
+     * 更新订单为已支付
+     *
+     * @param orderId 订单id
+     */
+    void updateOrderToIsPaid(Long orderId);
 }
