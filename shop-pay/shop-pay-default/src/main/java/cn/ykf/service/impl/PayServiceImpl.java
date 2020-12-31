@@ -75,7 +75,7 @@ public class PayServiceImpl implements PayService {
             log.error("参数不完整, {}", JSON.toJSONString(tradePay));
             return Result.of(ShopCode.SHOP_REQUEST_PARAMETER_VALID);
         }
-        if (Objects.equals(tradePay.getIsPaid(), ShopCode.SHOP_ORDER_PAY_STATUS_IS_PAY.getCode())) {
+        if (!Objects.equals(tradePay.getIsPaid(), ShopCode.SHOP_ORDER_PAY_STATUS_IS_PAY.getCode())) {
             log.error("订单未支付成功, 支付状态: {}", tradePay.getIsPaid());
             return Result.of(ShopCode.SHOP_ORDER_PAY_STATUS_NO_PAY);
         }
@@ -86,7 +86,7 @@ public class PayServiceImpl implements PayService {
                 MessageBuilder.withPayload(PayVo.of(tradePay.getPayId(), tradePay.getOrderId())).build(),
                 tradePay.getPayId());
 
-        log.info("事务消息结果：{}", result);
+        log.info("事务消息结果：{}, {}", result, result.getLocalTransactionState());
 
         if (LocalTransactionState.COMMIT_MESSAGE != result.getLocalTransactionState()) {
             return Result.of(ShopCode.SHOP_FAIL);
