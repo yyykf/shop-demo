@@ -77,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
             // 使用余额
             this.reduceMoneyPaid(order);
             // 模拟执行出错
-            BusinessException.cast(ShopCode.SHOP_FAIL);
+            // BusinessException.cast(ShopCode.SHOP_FAIL);
             // 确认订单
             this.updateOrderStatus(order);
 
