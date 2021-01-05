@@ -143,7 +143,7 @@ public class OrderServiceImpl implements OrderService {
             return;
         }
 
-        order.setOrderStatus(ShopCode.SHOP_ORDER_PAY_STATUS_IS_PAY.getCode());
+        order.setPayStatus(ShopCode.SHOP_ORDER_PAY_STATUS_IS_PAY.getCode());
         orderMapper.updateByPrimaryKey(order);
 
         log.info("更新订单支付状态成功");
